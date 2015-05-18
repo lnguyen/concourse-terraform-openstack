@@ -1,0 +1,24 @@
+jobs:
+- name: job-create-tenant
+  public: true
+  serial: true
+  plan:
+  - aggregate:
+    - get: concourse-terraform-openstack-git
+      resource: concourse-terraform-openstack-git
+      trigger: true
+  - task: create-openstack-user
+    config:
+      platform: linux
+      image: docker:///starkandwayne/cf
+      inputs:
+      - name: concourse-terraform-openstack-git
+      run:
+        path: scripts/create_new_tenant.sh
+      params:
+        OS_AUTH_URL: {{os_auth_url}}
+resources:
+- name: concourse-terraform-openstack-git
+  type: git
+  source:
+    uri: https://github.com/longnguyen11288/concourse-terraform-openstack.git
