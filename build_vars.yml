@@ -1,0 +1,21 @@
+---
+platform: linux
+
+image: docker:///starkandwayne/terraform
+
+inputs:
+- name: terraform-openstack-cf-git
+  path: .
+- name: concourse-terraform-openstack-git
+
+params:
+  OPENSTACK_USERNAME: {{openstack_username}}
+  OPENSTACK_PASSWORD: {{openstack_password}}
+  TENANT_NAME: {{tenant_name}}
+  TENANT_ID: {{tenant_id}}
+  FLOATING_IP_POOL: {{floating_ip_pool}}
+  NETWORK_EXTERNAL_ID: {{network_external_id}}
+  AUTH_URL: {{auth_url}}
+
+run:
+  path: concourse-terraform-openstack-git/ci/build_vars.sh
