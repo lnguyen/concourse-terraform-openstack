@@ -1,3 +1,3 @@
 #!/bin/bash
 
-chmod 600 robots-ssh-key/.
+chmod 600 robots*
