@@ -10,7 +10,7 @@ jobs:
   - task: create-openstack-user
     config:
       platform: linux
-      image: docker:///starkandwayne/cf
+      image: docker:///lnguyen/openstack
       inputs:
       - name: concourse-terraform-openstack-git
       run:
