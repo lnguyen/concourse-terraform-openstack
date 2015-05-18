@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-cat <<EOF > terraform.vars
+cat <<EOF > terraform.tfvars
 network = "192.168"
 auth_url="${AUTH_URL}"
 tenant_name="${TENANT_NAME}"
