@@ -12,21 +12,27 @@ compute = Fog::Compute.new({
 })
 
 # Delete servers
+puts "Cleaning out servers"
 compute.servers.each { |server| puts "Deleting server with name #{server.name}"; server.destroy }
 
 # Delete security groups but default
+puts "Cleaning out security groups"
 compute.security_groups.reject { |sg| sg.name == "default" }.each { |sg| puts "Deleting security group with name: #{sg.name}"; sg.destroy }
 
 # Delete Keypair
+puts "Cleaning out keypairs"
 compute.key_pairs.select{ |kp| kp.name == "bastion-keypair-#{ENV['OS_TENANT_NAME']}" }.each { |kp| puts "Deleting keypair with name #{kp.name}"; kp.destroy }
 
 # Delete Volumes
+puts "Cleaning out volumes"
 compute.volumes.each { |vol| puts "Deleting volume with name #{vol.name}"; vol.destroy }
 
 # Delete floating ips
+puts "Cleaning out floating ips"
 compute.addresses.each{ |address| puts "Deleting floating ip with name #{address.name}"; address.destroy }
 
 # Delete images
+puts "Cleaning out images"
 compute.images.select{ |image| image.name =~ /BOSH-.*/}.each { |image| puts "Deleting image with name #{image.name}"; image.destroy }
 
 network = Fog::Network.new({
@@ -38,7 +44,7 @@ network = Fog::Network.new({
   :connection_options  => {}
 })
 
-puts "Clearing out ports"
+puts "Cleaning out ports"
 # Clear out ports
 network.ports.select{ |port| port.device_owner == "network:router_interface"}.each do |port|
   port.fixed_ips.each do |subnet|
@@ -52,16 +58,16 @@ end
 # at time.
 # Sorry,
 # Past Long
-puts "Clearing out routers"
+puts "Cleaning out routers"
 network.routers.each do |router|
   `neutron router-gateway-clear #{router.id}`
   router.destroy
 end
 
 # Clear out subnets
-puts "Clearing out subnets"
+puts "Cleaning out subnets"
 network.subnets.each { |subnet| puts "Deleting subnet with naem #{subnet.name}"; subnet.destroy }
 
 # Clear out networks
-puts "Clearing out networks"
+puts "Cleaning out networks"
 network.networks.reject{ |network| network.name == "net04_ext"}.each { |network| puts "Deleting network with name #{network.name}"; network.destroy }
