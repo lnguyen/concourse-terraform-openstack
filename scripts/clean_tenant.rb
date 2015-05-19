@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'fog'
+
 compute = Fog::Compute.new({
     :provider            => 'openstack',                                      # OpenStack Fog provider
     :openstack_auth_url  => ENV['OS_AUTH_URL'], # OpenStack Keystone endpoint
