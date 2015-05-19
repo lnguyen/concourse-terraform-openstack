@@ -1,0 +1,156 @@
+jobs:
+- name: test-terraform
+  public: true
+  serial: true
+  plan:
+  - aggregate:
+    - get: terraform-openstack-cf-git
+      resource: terraform-openstack-cf-git
+      trigger: true
+  - task: run-tests
+    config:
+      platform: linux
+      image: docker:///starkandwayne/terraform
+      inputs:
+      - name: terraform-openstack-cf-git
+        path: .
+      run:
+        path: make
+        args: ["test"]
+- name: clean-tenant
+  public: true
+  serial: true
+  plan:
+  - aggregate:
+    - get: concourse-terraform-openstack-git
+      resource: concourse-terraform-openstack-git
+      trigger: false
+    - get: terraform-openstack-cf-git
+      resource: terraform-openstack-cf-git
+      trigger: true
+  - task: clean-tenant
+    config:
+      platform: linux
+      image: docker:///starkandwayne/openstack
+      inputs:
+      - name: concourse-terraform-openstack-git
+        path: .
+      params:
+        OS_USERNAME: {{openstack_username}}
+        OS_PASSWORD: {{openstack_password}}
+        OS_TENANT_NAME: {{tenant_name}}
+        OS_AUTH_URL: {{auth_url}}
+      run:
+        path: scripts/clean_tenant.rb
+- name: terraform-deploy
+  public: true
+  serial: true
+  plan:
+  - aggregate:
+    - get: concourse-terraform-openstack-git
+      resource: concourse-terraform-openstack-git
+      trigger: false
+    - get: terraform-openstack-cf-git
+      resource: terraform-openstack-cf-git
+      passed: [test-terraform, clean-tenant]
+    - get: robots-ssh-key
+      resource: robots-ssh-key
+      trigger: false
+    - get: cf-release-bosh-release
+      resource: cf-release-bosh-release
+      trigger: true
+      params:
+        tarball: false
+  - task: build-terraform-vars
+    config:
+      platform: linux
+      image: docker:///ubuntu#14.04
+      inputs:
+      - name: terraform-openstack-cf-git
+        path: .
+      - name: concourse-terraform-openstack-git
+      - name: cf-release-bosh-release
+      params:
+        OPENSTACK_USERNAME: {{openstack_username}}
+        OPENSTACK_PASSWORD: {{openstack_password}}
+        TENANT_NAME: {{tenant_name}}
+        TENANT_ID: {{tenant_id}}
+        FLOATING_IP_POOL: {{floating_ip_pool}}
+        NETWORK_EXTERNAL_ID: {{network_external_id}}
+        AUTH_URL: {{auth_url}}
+      run:
+        path: concourse-terraform-openstack-git/scripts/build_vars_upgrade_cf.sh
+  - put: s3-tfstate
+    params: {from: terraform.tfvars}
+  - task: ls-files
+    config:
+      platform: linux
+      image: docker:///ubuntu#14.04
+      inputs:
+      - name: terraform-openstack-cf-git
+        path: .
+      - name: build-terraform-vars
+      - name: robots-ssh-key
+      - name: concourse-terraform-openstack-git
+      run:
+        path: ls
+        args: ["-opR", "."]
+  - task: fix-ssh-key-permission
+    config:
+      platform: linux
+      image: docker:///ubuntu#14.04
+      inputs:
+      - name: robots-ssh-key
+        path: .
+      - name: concourse-terraform-openstack-git
+      run:
+        path: concourse-terraform-openstack-git/scripts/fix_ssh_keys.sh
+  - task: run-terraform
+    config:
+      platform: linux
+      image: docker:///starkandwayne/terraform
+      inputs:
+      - name: build-terraform-vars
+        path: .
+      - name: fix-ssh-key-permission
+      - name: concourse-terraform-openstack-git
+      run:
+        path: concourse-terraform-openstack-git/scripts/run_terraform.sh
+  - put: s3-tfstate
+    params: {from: terraform.tfstate}
+  - task: ls-abc-xyz
+    config:
+      platform: linux
+      image: docker:///ubuntu#14.04
+      inputs:
+      - name: run-terraform
+      run:
+        path: ls
+        args: ["-opR", "."]
+
+resources:
+- name: concourse-terraform-openstack-git
+  type: git
+  source:
+    uri: https://github.com/longnguyen11288/concourse-terraform-openstack.git
+- name: terraform-openstack-cf-git
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry-community/terraform-openstack-cf-install.git
+    branch: cf_release_version
+- name: robots-ssh-key
+  type: git
+  source:
+    uri: https://gist.github.com/longnguyen11288/e923f965154e52679dd8.git
+- name: cf-release-bosh-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry/cf-release
+- name: s3-tfstate
+  type: s3
+  source:
+    access_key_id: {{access-key-id}}
+    secret_access_key: {{secret-access-key}}
+    region_name: {{region-name}}
+    bucket:  {{pipeline-bucket}}
+    private: true
