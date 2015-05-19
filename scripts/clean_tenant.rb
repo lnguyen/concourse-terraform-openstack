@@ -38,6 +38,7 @@ network = Fog::Network.new({
   :connection_options  => {}
 })
 
+puts "Clearing out ports"
 # Clear out ports
 network.ports.select{ |port| port.device_owner == "network:router_interface"}.each do |port|
   port.fixed_ips.each do |subnet|
@@ -51,13 +52,16 @@ end
 # at time.
 # Sorry,
 # Past Long
+puts "Clearing out routers"
 network.routers.each do |router|
   `neutron router-gateway-clear #{router.id}`
   router.destroy
 end
 
 # Clear out subnets
-network.subnets.each { |subnet| subnet.destroy }
+puts "Clearing out subnets"
+network.subnets.each { |subnet| puts "Deleting subnet with naem #{subnet.name}"; subnet.destroy }
 
 # Clear out networks
-network.networks.each { |network| network.destroy }
+puts "Clearing out networks"
+network.networks.reject{ |network| network.name == "net04_ext"}.each { |network| puts "Deleting network with name #{network.name}"; network.destroy }
