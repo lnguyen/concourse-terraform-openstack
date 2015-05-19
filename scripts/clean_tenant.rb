@@ -15,6 +15,9 @@ compute = Fog::Compute.new({
 puts "Cleaning out servers"
 compute.servers.each { |server| puts "Deleting server with name #{server.name}"; server.destroy }
 
+#Sleep just in case server haven't been destroyed yet
+sleep 10
+
 # Delete security groups but default
 puts "Cleaning out security groups"
 compute.security_groups.reject { |sg| sg.name == "default" }.each { |sg| puts "Deleting security group with name: #{sg.name}"; sg.destroy }

@@ -49,13 +49,13 @@ jobs:
   - aggregate:
     - get: concourse-terraform-openstack-git
       resource: concourse-terraform-openstack-git
-      trigger: true
+      trigger: false
     - get: terraform-openstack-cf-git
       resource: terraform-openstack-cf-git
       passed: [test-terraform, clean-tenant]
     - get: robots-ssh-key
       resource: robots-ssh-key
-      trigger: true
+      trigger: false
   - task: build-terraform-vars
     config:
       platform: linux
