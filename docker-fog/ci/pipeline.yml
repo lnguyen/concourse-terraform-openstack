@@ -5,12 +5,12 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: docker-fog
+    - get: concourse-terraform-openstack-git
       resource: concourse-terraform-openstack-git
       trigger: true
   - put: docker-fog-image
     params:
-      build: concourse-terraform-openstack/docker-fog
+      build: concourse-terraform-openstack-git/docker-fog
 
 
 resources:
