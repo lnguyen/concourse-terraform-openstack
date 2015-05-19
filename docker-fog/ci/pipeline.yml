@@ -26,4 +26,4 @@ resources:
     email: {{docker-hub-email}}
     username: {{docker-hub-username}}
     password: {{docker-hub-password}}
-    repository: starkandwayne/fog
+    repository: starkandwayne/openstack

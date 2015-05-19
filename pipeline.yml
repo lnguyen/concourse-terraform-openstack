@@ -28,7 +28,7 @@ jobs:
   - task: clean-tenant
     config:
       platform: linux
-      image: docker:///lnguyen/openstack
+      image: docker:///starkandwayne/openstack
       inputs:
       - name: concourse-terraform-openstack-git
         path: .
@@ -38,7 +38,7 @@ jobs:
         OS_TENANT_NAME: {{tenant_name}}
         OS_AUTH_URL: {{auth_url}}
       run:
-        path: scripts/clean_tenant.sh
+        path: scripts/clean_tenant.rb
 - name: terraform-deploy
   public: true
   serial: true
