@@ -29,7 +29,7 @@ compute.volumes.each { |vol| puts "Deleting volume with name #{vol.name}"; vol.d
 
 # Delete floating ips
 puts "Cleaning out floating ips"
-compute.addresses.each{ |address| puts "Deleting floating ip with name #{address.name}"; address.destroy }
+compute.addresses.each{ |address| puts "Deleting floating ip with ip #{address.ip}"; address.destroy }
 
 # Delete images
 puts "Cleaning out images"
