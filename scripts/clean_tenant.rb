@@ -2,12 +2,14 @@
 
 require 'fog'
 
+puts "#{ENV['OS_AUTH_URL']}/tokens"
+puts ENV['OS_USERNAME']
 compute = Fog::Compute.new({
-    :provider            => 'openstack',                                     
+    :provider            => 'openstack',
     :openstack_auth_url  => "#{ENV['OS_AUTH_URL']}/tokens",
-    :openstack_username  => ENV['OS_USERNAME'],
-    :openstack_tenant    => ENV['OS_TENANT_NAME'],
-    :openstack_api_key   => ENV['OS_PASSWORD'],
+    :openstack_username  => "#{ENV['OS_USERNAME']}",
+    :openstack_tenant    => "#{ENV['OS_TENANT_NAME']}",
+    :openstack_api_key   => "#{ENV['OS_PASSWORD']}",
     :connection_options  => {}
 })
 
@@ -30,12 +32,12 @@ compute.addresses.each{ |address| address.destroy }
 compute.images.select{ |image| image.name =~ /BOSH-.*/}.each { |image| image.destroy }
 
 network = Fog::Network.new({
-    :provider            => 'openstack',                                      # OpenStack Fog provider
-    :openstack_auth_url  => ENV['OS_AUTH_URL'], # OpenStack Keystone endpoint
-    :openstack_username  => ENV['OS_USERNAME'],                                  # Your OpenStack Username
-    :openstack_tenant    => ENV['OS_TENANT_NAME'],                                # Your tenant id
-    :openstack_api_key   => ENV['OS_PASSWORD'],                              # Your OpenStack Password
-    :connection_options  => {}                                                # Optional
+  :provider            => 'openstack',
+  :openstack_auth_url  => "#{ENV['OS_AUTH_URL']}/tokens",
+  :openstack_username  => "#{ENV['OS_USERNAME']}",
+  :openstack_tenant    => "#{ENV['OS_TENANT_NAME']}",
+  :openstack_api_key   => "#{ENV['OS_PASSWORD']}",
+  :connection_options  => {}
 })
 
 # Clean up router
