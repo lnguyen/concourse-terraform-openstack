@@ -2,8 +2,6 @@
 
 require 'fog'
 
-puts "#{ENV['OS_AUTH_URL']}/tokens"
-puts ENV['OS_USERNAME']
 compute = Fog::Compute.new({
     :provider            => 'openstack',
     :openstack_auth_url  => "#{ENV['OS_AUTH_URL']}/tokens",
@@ -14,22 +12,22 @@ compute = Fog::Compute.new({
 })
 
 # Delete servers
-compute.servers.each { |server| server.destroy }
+compute.servers.each { |server| puts "Deleting server with name #{server.name}"; server.destroy }
 
 # Delete security groups but default
-compute.security_groups.reject { |sg| sg.name == "default" }.each { |sg| sg.destroy }
+compute.security_groups.reject { |sg| sg.name == "default" }.each { |sg| puts "Deleting security group with name: #{sg.name}"; sg.destroy }
 
 # Delete Keypair
-compute.key_pairs.select{ |kp| kp.name == "bastion-keypair-#{ENV['OS_TENANT_NAME']}" }.each { |kp| kp.destroy }
+compute.key_pairs.select{ |kp| kp.name == "bastion-keypair-#{ENV['OS_TENANT_NAME']}" }.each { |kp| puts "Deleting keypair with name #{kp.name}"; kp.destroy }
 
 # Delete Volumes
-compute.volumes.each { |vol| vol.destroy }
+compute.volumes.each { |vol| puts "Deleting volume with name #{vol.name}"; vol.destroy }
 
 # Delete floating ips
-compute.addresses.each{ |address| address.destroy }
+compute.addresses.each{ |address| puts "Deleting floating ip with name #{address.name}"; address.destroy }
 
 # Delete images
-compute.images.select{ |image| image.name =~ /BOSH-.*/}.each { |image| image.destroy }
+compute.images.select{ |image| image.name =~ /BOSH-.*/}.each { |image| puts "Deleting image with name #{image.name}"; image.destroy }
 
 network = Fog::Network.new({
   :provider            => 'openstack',
@@ -40,6 +38,14 @@ network = Fog::Network.new({
   :connection_options  => {}
 })
 
+# Clear out ports
+network.ports.select{ |port| port.device_owner == "network:router_interface"}.each do |port|
+  port.fixed_ips.each do |subnet|
+    network.remove_router_interface(port.device_id,subnet["subnet_id"])
+  end unless port.fixed_ips.empty?
+end
+
+
 # Clean up router
 # Shell out and I feel bad but only way I could figure out
 # at time.
@@ -49,9 +55,6 @@ network.routers.each do |router|
   `neutron router-gateway-clear #{router.id}`
   router.destroy
 end
-
-# Clear out ports
-network.ports.each { |port| port.destroy }
 
 # Clear out subnets
 network.subnets.each { |subnet| subnet.destroy }
