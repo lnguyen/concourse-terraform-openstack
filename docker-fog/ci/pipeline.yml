@@ -1,0 +1,29 @@
+
+jobs:
+- name: job-docker-cf
+  public: true
+  serial: true
+  plan:
+  - aggregate:
+    - get: docker-fog
+      resource: concourse-terraform-openstack-git
+      trigger: true
+  - put: docker-fog-image
+    params:
+      build: concourse-terraform-openstack/docker-fog
+
+
+resources:
+- name: concourse-terraform-openstack-git
+  type: git
+  source:
+    uri: https://github.com/longnguyen11288/concourse-terraform-openstack.git
+    access_token: {{github-access-token}}
+
+- name: docker-fog-image
+  type: docker-image
+  source:
+    email: {{docker-hub-email}}
+    username: {{docker-hub-username}}
+    password: {{docker-hub-password}}
+    repository: starkandwayne/fog
