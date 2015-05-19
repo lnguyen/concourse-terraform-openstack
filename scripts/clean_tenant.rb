@@ -66,7 +66,7 @@ end
 
 # Clear out subnets
 puts "Cleaning out subnets"
-network.subnets.each { |subnet| puts "Deleting subnet with naem #{subnet.name}"; subnet.destroy }
+network.subnets.each { |subnet| puts "Deleting subnet with name #{subnet.name}"; subnet.destroy }
 
 # Clear out networks
 puts "Cleaning out networks"

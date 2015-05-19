@@ -25,6 +25,9 @@ jobs:
     - get: concourse-terraform-openstack-git
       resource: concourse-terraform-openstack-git
       trigger: true
+    - get: terraform-openstack-cf-git
+      resource: terraform-openstack-cf-git
+      trigger: true
   - task: clean-tenant
     config:
       platform: linux
