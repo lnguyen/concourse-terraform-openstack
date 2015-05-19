@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 cat <<EOF > terraform.tfvars
 network = "192.168"
 auth_url="${AUTH_URL}"

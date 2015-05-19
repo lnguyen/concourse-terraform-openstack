@@ -127,6 +127,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry-community/terraform-openstack-cf-install.git
+    branch: cf_release_version
 - name: robots-ssh-key
   type: git
   source:

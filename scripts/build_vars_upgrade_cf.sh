@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cf_release_version=(cat cf-release-bosh-release/version)
+cf_release_version=$(cat cf-release-bosh-release/version)
 
 cat <<EOF > terraform.tfvars
 network = "192.168"
