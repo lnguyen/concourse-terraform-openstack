@@ -72,6 +72,8 @@ jobs:
         FLOATING_IP_POOL: {{floating_ip_pool}}
         NETWORK_EXTERNAL_ID: {{network_external_id}}
         AUTH_URL: {{auth_url}}
+        HTTP_PROXY: {{http_proxy}}
+        HTTPS_PROXY: {{https_proxy}}
       run:
         path: concourse-terraform-openstack-git/scripts/build_vars-proxy.sh
   - task: ls-files
@@ -97,7 +99,7 @@ jobs:
       - name: concourse-terraform-openstack-git
       run:
         path: concourse-terraform-openstack-git/scripts/fix_ssh_keys.sh
-  - task: run-terraform
+  - task: run-terraform-proxy
     config:
       platform: linux
       image: docker:///starkandwayne/terraform
