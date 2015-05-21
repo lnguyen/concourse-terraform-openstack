@@ -80,8 +80,6 @@ jobs:
         AUTH_URL: {{auth_url}}
       run:
         path: concourse-terraform-openstack-git/scripts/build_vars_upgrade_cf.sh
-  - put: s3-tfstate
-    params: {from: terraform.tfvars}
   - task: ls-files
     config:
       platform: linux
@@ -116,8 +114,6 @@ jobs:
       - name: concourse-terraform-openstack-git
       run:
         path: concourse-terraform-openstack-git/scripts/run_terraform.sh
-  - put: s3-tfstate
-    params: {from: terraform.tfstate}
   - task: ls-abc-xyz
     config:
       platform: linux
@@ -137,7 +133,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry-community/terraform-openstack-cf-install.git
-    branch: cf_release_version
+    branch: cf_release_version_2
 - name: robots-ssh-key
   type: git
   source:
@@ -146,11 +142,3 @@ resources:
   type: bosh-io-release
   source:
     repository: cloudfoundry/cf-release
-- name: s3-tfstate
-  type: s3
-  source:
-    access_key_id: {{access-key-id}}
-    secret_access_key: {{secret-access-key}}
-    region_name: {{region-name}}
-    bucket:  {{pipeline-bucket}}
-    private: true
