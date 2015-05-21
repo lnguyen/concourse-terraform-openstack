@@ -110,15 +110,15 @@ jobs:
       - name: concourse-terraform-openstack-git
       run:
         path: concourse-terraform-openstack-git/scripts/run_terraform.sh
-  - task: ls-abc-xyz
-    config:
-      platform: linux
-      image: docker:///ubuntu#14.04
-      inputs:
-      - name: run-terraform
-      run:
-        path: ls
-        args: ["-opR", "."]
+#  - task: ls-abc-xyz
+#    config:
+#      platform: linux
+#      image: docker:///ubuntu#14.04
+#      inputs:
+#      - name: run-terraform
+#      run:
+#        path: ls
+#        args: ["-opR", "."]
 
 resources:
 - name: concourse-terraform-openstack-git
