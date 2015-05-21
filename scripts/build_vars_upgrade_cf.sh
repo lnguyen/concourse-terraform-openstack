@@ -16,4 +16,5 @@ region="RegionOne"
 network_external_id="${NETWORK_EXTERNAL_ID}"
 install_docker_services="true"
 cf_release_version="${cf_release_version}"
+cf_boshworkspace_version="cf_release_verison"
 EOF
