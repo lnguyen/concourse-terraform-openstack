@@ -56,6 +56,11 @@ jobs:
     - get: robots-ssh-key
       resource: robots-ssh-key
       trigger: false
+    - get: cf-release-bosh-release
+      resource: cf-release-bosh-release
+      trigger: true
+      params:
+        tarball: false
   - task: build-terraform-vars
     config:
       platform: linux
@@ -64,6 +69,7 @@ jobs:
       - name: terraform-openstack-cf-git
         path: .
       - name: concourse-terraform-openstack-git
+      - name: cf-release-bosh-release
       params:
         OPENSTACK_USERNAME: {{openstack_username}}
         OPENSTACK_PASSWORD: {{openstack_password}}
@@ -73,7 +79,9 @@ jobs:
         NETWORK_EXTERNAL_ID: {{network_external_id}}
         AUTH_URL: {{auth_url}}
       run:
-        path: concourse-terraform-openstack-git/scripts/build_vars.sh
+        path: concourse-terraform-openstack-git/scripts/build_vars_upgrade_cf.sh
+  - put: s3-tfstate
+    params: {from: terraform.tfvars}
   - task: ls-files
     config:
       platform: linux
@@ -108,6 +116,8 @@ jobs:
       - name: concourse-terraform-openstack-git
       run:
         path: concourse-terraform-openstack-git/scripts/run_terraform.sh
+  - put: s3-tfstate
+    params: {from: terraform.tfstate}
   - task: ls-abc-xyz
     config:
       platform: linux
@@ -132,3 +142,15 @@ resources:
   type: git
   source:
     uri: https://gist.github.com/longnguyen11288/e923f965154e52679dd8.git
+- name: cf-release-bosh-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry/cf-release
+- name: s3-tfstate
+  type: s3
+  source:
+    access_key_id: {{access-key-id}}
+    secret_access_key: {{secret-access-key}}
+    region_name: {{region-name}}
+    bucket:  {{pipeline-bucket}}
+    private: true

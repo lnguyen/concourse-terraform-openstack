@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cf_release_version=$(cat cf-release-bosh-release/version)
+
 cat <<EOF > terraform.tfvars
 network = "192.168"
 auth_url="${AUTH_URL}"
@@ -13,4 +15,5 @@ floating_ip_pool="${FLOATING_IP_POOL}"
 region="RegionOne"
 network_external_id="${NETWORK_EXTERNAL_ID}"
 install_docker_services="true"
+cf_release_version="${cf_release_version}"
 EOF
