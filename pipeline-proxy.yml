@@ -74,6 +74,7 @@ jobs:
         AUTH_URL: {{auth_url}}
         HTTP_PROXY: {{http_proxy}}
         HTTPS_PROXY: {{https_proxy}}
+        CF_BOSHWORKSPACE_VERSION: {{cf_boshworkspace_version}}
       run:
         path: concourse-terraform-openstack-git/scripts/build_vars-proxy.sh
   - task: ls-files

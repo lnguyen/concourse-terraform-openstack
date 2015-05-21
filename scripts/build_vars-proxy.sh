@@ -16,4 +16,5 @@ network_external_id="${NETWORK_EXTERNAL_ID}"
 install_docker_services="true"
 http_proxy="${HTTP_PROXY}"
 https_proxy="${HTTPS_PROXY}"
+cf_boshworkspace_version="${CF_BOSHWORKSPACE_VERSION}"
 EOF
