@@ -53,6 +53,7 @@ jobs:
     - get: terraform-openstack-cf-git
       resource: terraform-openstack-cf-git
       passed: [test-terraform, clean-tenant]
+      trigger: true
     - get: robots-ssh-key
       resource: robots-ssh-key
       trigger: false
